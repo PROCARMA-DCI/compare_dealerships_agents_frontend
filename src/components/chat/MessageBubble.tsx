@@ -7,6 +7,10 @@ import { Message } from "@/types/chat";
 import { AlertCircle, Bot, Check, Copy, User } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+// react-markdown renders markdown string to React elements
+// remark-gfm adds GitHub Flavored Markdown: tables, strikethrough, task lists, etc.
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface MessageBubbleProps {
   message: Message;
@@ -53,7 +57,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           )}
 
           {message.content ? (
-            <p className="whitespace-pre-wrap break-words">{message.content}</p>
+            // MarkdownContent handles rendering: paragraphs, tables, code, lists, etc.
+            <MarkdownContent content={message.content} isUser={isUser} />
           ) : isStreaming ? (
             <ThinkingDots />
           ) : null}
@@ -130,6 +135,96 @@ function ThinkingDots() {
         />
       ))}
     </div>
+  );
+}
+
+// Renders assistant/user message content as rich Markdown.
+// isUser flips text color so tables/code stay readable on the primary bg.
+function MarkdownContent({ content, isUser }: { content: string; isUser: boolean }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]} // enables tables, strikethrough, task lists
+      components={{
+        // --- block elements ---
+        p: ({ children }) => (
+          <p className="mb-1 last:mb-0 whitespace-pre-wrap wrap-break-word">{children}</p>
+        ),
+        // tables: full-width, bordered, zebra rows
+        table: ({ children }) => (
+          <div className="my-2 overflow-x-auto rounded-md">
+            <table className={cn(
+              "w-full border-collapse text-xs",
+              isUser ? "text-primary-foreground" : "text-card-foreground",
+            )}>
+              {children}
+            </table>
+          </div>
+        ),
+        thead: ({ children }) => (
+          <thead className={cn(
+            "font-semibold",
+            isUser ? "bg-primary/30" : "bg-muted",
+          )}>
+            {children}
+          </thead>
+        ),
+        tbody: ({ children }) => (
+          // odd/even handled via CSS child selector — no Tailwind class for nth-child
+          <tbody className="divide-y divide-border/40">{children}</tbody>
+        ),
+        tr: ({ children }) => (
+          <tr className="hover:bg-muted/30 transition-colors">{children}</tr>
+        ),
+        th: ({ children }) => (
+          <th className="px-3 py-1.5 text-left font-semibold border border-border/30">{children}</th>
+        ),
+        td: ({ children }) => (
+          <td className="px-3 py-1.5 border border-border/20">{children}</td>
+        ),
+        // inline code
+        code: ({ children }) => (
+          <code className={cn(
+            "rounded px-1 py-0.5 text-[11px] font-mono",
+            isUser ? "bg-primary/20" : "bg-muted",
+          )}>
+            {children}
+          </code>
+        ),
+        // fenced code block
+        pre: ({ children }) => (
+          <pre className={cn(
+            "my-2 overflow-x-auto rounded-md p-3 text-[11px] font-mono leading-relaxed",
+            isUser ? "bg-primary/20" : "bg-muted",
+          )}>
+            {children}
+          </pre>
+        ),
+        // lists
+        ul: ({ children }) => <ul className="my-1 ml-4 list-disc space-y-0.5">{children}</ul>,
+        ol: ({ children }) => <ol className="my-1 ml-4 list-decimal space-y-0.5">{children}</ol>,
+        li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+        // headings (rare in chat but handled)
+        h1: ({ children }) => <h1 className="mt-2 mb-1 text-base font-bold">{children}</h1>,
+        h2: ({ children }) => <h2 className="mt-2 mb-1 text-sm font-bold">{children}</h2>,
+        h3: ({ children }) => <h3 className="mt-1 mb-0.5 text-sm font-semibold">{children}</h3>,
+        // blockquote
+        blockquote: ({ children }) => (
+          <blockquote className={cn(
+            "my-1 border-l-2 pl-3 italic",
+            isUser ? "border-primary-foreground/40" : "border-border",
+          )}>
+            {children}
+          </blockquote>
+        ),
+        // horizontal rule
+        hr: () => <hr className="my-2 border-border/40" />,
+        // bold / italic — let browser defaults handle, just pass through
+        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+        em: ({ children }) => <em className="italic">{children}</em>,
+      }}
+    >
+      {content}
+    </ReactMarkdown>
   );
 }
 
