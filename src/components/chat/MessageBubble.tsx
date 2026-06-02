@@ -30,11 +30,11 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       {/* Avatar */}
       <Avatar isUser={isUser} isError={isError} />
 
-      {/* Bubble */}
+      {/* Main Content */}
       <div
         className={cn(
-          "relative max-w-[80%] min-w-0",
-          isUser ? "items-end" : "items-start",
+          "relative max-w-[80%] min-w-0 ",
+          isUser ? "items-end " : "items-start",
           "flex flex-col gap-1",
         )}
       >

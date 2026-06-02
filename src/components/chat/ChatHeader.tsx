@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Conversation } from "@/types/chat";
-import { Bot, Eraser, Menu, Moon, Settings, Sun } from "lucide-react";
+import { Bot, Eraser, Moon, Settings, Sun } from "lucide-react";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
@@ -36,14 +36,14 @@ export function ChatHeader({
       <header className="flex h-14 items-center justify-between border-b border-border bg-card/80 px-4 text-card-foreground backdrop-blur-md">
         {/* Left */}
         <div className="flex items-center gap-3">
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
             onClick={onMenuToggle}
             className="h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground lg:hidden"
           >
             <Menu className="h-8 w-8" />
-          </Button>
+          </Button> */}
 
           <div className="flex items-center gap-2.5">
             {/* Status dot */}
