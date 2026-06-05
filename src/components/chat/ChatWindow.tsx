@@ -1,14 +1,22 @@
 "use client";
 
+import { AuthData, clearAuth, getAuth } from "@/action/localStorage";
+import { SignInModal } from "@/components/auth/SignInModal";
 import { useChat } from "@/hooks/use-chat";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import { ChatHeader } from "./ChatHeader";
 import { ChatInput } from "./ChatInput";
 import { MessageList } from "./MessageList";
 
 export function ChatWindow() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [auth, setAuth] = useState<AuthData | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAuth(getAuth());
+    setAuthChecked(true);
+  }, []);
 
   const {
     conversations,
@@ -21,28 +29,21 @@ export function ChatWindow() {
     newConversation,
     deleteConversation,
     clearMessages,
-  } = useChat();
+  } = useChat({ authToken: auth?.token });
+
+  if (!authChecked) return null;
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
-      {/* Sidebar */}
-      {/* <Sidebar
-        conversations={conversations}
-        activeId={activeId}
-        onSelect={setActiveId}
-        onNew={newConversation}
-        onDelete={deleteConversation}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      /> */}
+      <SignInModal open={!auth} onSuccess={(data) => setAuth(data)} />
 
-      {/* Chat panel */}
       <main className="flex flex-1 flex-col overflow-hidden">
         <ChatHeader
           conversation={activeConversation}
           isLoading={isLoading}
-          onMenuToggle={() => setSidebarOpen((o) => !o)}
+          onMenuToggle={() => {}}
           onClear={clearMessages}
+          onLogout={() => { clearAuth(); setAuth(null); }}
         />
 
         <MessageList messages={activeConversation.messages} />

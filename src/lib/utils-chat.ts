@@ -48,10 +48,12 @@ export async function sendDatabaseChatMessage({
   message,
   sessionId,
   signal,
+  authToken,
 }: {
   message: string;
   sessionId: string;
   signal?: AbortSignal;
+  authToken?: string;
 }) {
   const response = await fetchPost<
     { message: string; session_id: string },
@@ -60,6 +62,7 @@ export async function sendDatabaseChatMessage({
     api: "database/chat",
     body: { message, session_id: sessionId },
     signal,
+    headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined,
   });
 
   if (!response.success || !response.data) {

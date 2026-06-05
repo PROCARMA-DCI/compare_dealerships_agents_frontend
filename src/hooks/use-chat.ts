@@ -11,10 +11,11 @@ import { useCallback, useRef, useState } from "react";
 
 interface UseChatOptions {
   onError?: (err: Error) => void;
+  authToken?: string;
 }
 
 export function useChat(options: UseChatOptions = {}) {
-  const { onError } = options;
+  const { onError, authToken } = options;
 
   const [conversations, setConversations] = useState<Conversation[]>(() => [
     createConversation("Dealership Assistant"),
@@ -103,6 +104,7 @@ export function useChat(options: UseChatOptions = {}) {
           message,
           sessionId: backendSessionId,
           signal: controller.signal,
+          authToken,
         });
 
         // Keep the backend session id returned by the API.
@@ -151,6 +153,7 @@ export function useChat(options: UseChatOptions = {}) {
       updateConversation,
       updateMessage,
       onError,
+      authToken,
     ],
   );
 

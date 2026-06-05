@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Conversation } from "@/types/chat";
-import { Bot, Eraser, Moon, Settings, Sun } from "lucide-react";
+import { Bot, Eraser, LogOut, Moon, Settings, Sun } from "lucide-react";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
@@ -19,6 +19,7 @@ interface ChatHeaderProps {
   isLoading: boolean;
   onMenuToggle: () => void;
   onClear: () => void;
+  onLogout: () => void;
 }
 
 export function ChatHeader({
@@ -26,6 +27,7 @@ export function ChatHeader({
   isLoading,
   onMenuToggle,
   onClear,
+  onLogout,
 }: ChatHeaderProps) {
   const { resolvedTheme, setTheme } = useTheme();
   const mounted = useIsMounted();
@@ -125,6 +127,26 @@ export function ChatHeader({
               className="border-border bg-popover text-xs text-popover-foreground"
             >
               Settings
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onLogout}
+                className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
+                aria-label="Logout"
+              >
+                <LogOut className="h-8 w-8" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent
+              side="bottom"
+              className="border-border bg-popover text-xs text-popover-foreground"
+            >
+              Logout
             </TooltipContent>
           </Tooltip>
         </div>
